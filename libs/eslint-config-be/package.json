@@ -22,7 +22,7 @@
 		"url": "https://github.com/tomcupak/apinecka-libs.git",
 		"directory": "libs/eslint-config-be"
 	},
-	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/main/libs/eslint-config-be#readme",
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/master/libs/eslint-config-be#readme",
 	"bugs": {
 		"url": "https://github.com/tomcupak/apinecka-libs/issues"
 	},

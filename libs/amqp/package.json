@@ -33,7 +33,7 @@
 		"url": "https://github.com/tomcupak/apinecka-libs.git",
 		"directory": "libs/amqp"
 	},
-	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/main/libs/amqp#readme",
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/master/libs/amqp#readme",
 	"bugs": {
 		"url": "https://github.com/tomcupak/apinecka-libs/issues"
 	},
