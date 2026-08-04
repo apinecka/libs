@@ -1,0 +1,17 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"declaration": true,
+		"rootDir": "src",
+		"outDir": "dist",
+		// Standalone build only: resolve the peer dep from its built dist output (as a real
+		// npm install would) instead of the monorepo's dev-time source path, so this package's
+		// own rootDir isn't violated by pulling in @apinecka/amqp's raw .ts sources. Run
+		// `npm run build` in libs/amqp first.
+		"paths": {
+			"@apinecka/amqp": ["libs/amqp/dist/index"],
+		},
+	},
+	"include": ["src/**/*"],
+	"exclude": ["src/**/*.spec.ts"]
+}

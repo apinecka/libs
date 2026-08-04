@@ -1,0 +1,10 @@
+{
+	"name": "apinecka-libs",
+	"private": true,
+	"license": "MIT",
+	"description": "Public @apinecka npm packages: amqp, amqp-schema, eslint-config-be, eslint-config-web, redis.",
+	"engines": {
+		"npm": ">=11.6",
+		"node": ">=24.10"
+	}
+}

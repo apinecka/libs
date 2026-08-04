@@ -1,0 +1,55 @@
+{
+	"name": "@apinecka/redis",
+	"version": "1.0.0",
+	"description": "NestJS module for Redis: a global ioredis connection, a tag-based cache-aside helper (RedisCache), and a distributed lock helper (RedisLocks).",
+	"keywords": [
+		"nestjs",
+		"redis",
+		"ioredis",
+		"cache",
+		"distributed-lock"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc",
+		"clean": "del-cli dist",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"author": "Tomáš Cupák <tomcupak@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tomcupak/apinecka-libs.git",
+		"directory": "libs/redis"
+	},
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/main/libs/redis#readme",
+	"bugs": {
+		"url": "https://github.com/tomcupak/apinecka-libs/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"peerDependencies": {
+		"@nestjs/common": "^11.0.0",
+		"ioredis": "^5.6"
+	},
+	"devDependencies": {
+		"@nestjs/common": "^11.1.7",
+		"@types/node": "^22.15.33",
+		"del-cli": "^7.0.0",
+		"ioredis": "^5.6.1",
+		"typescript": "^5.8.3"
+	}
+}

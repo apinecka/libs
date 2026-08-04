@@ -1,0 +1,42 @@
+{
+	"name": "@apinecka/eslint-config-web",
+	"version": "1.0.0",
+	"description": "Shared ESLint flat config for apinecka React/TypeScript frontends (tabs, import sorting, unused-imports, react-hooks).",
+	"keywords": [
+		"eslint",
+		"eslint-config",
+		"eslint-flat-config",
+		"typescript",
+		"react"
+	],
+	"main": "index.mjs",
+	"files": [
+		"*.mjs",
+		"*.md",
+		"LICENSE"
+	],
+	"author": "Tomáš Cupák <tomcupak@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tomcupak/apinecka-libs.git",
+		"directory": "libs/eslint-config-web"
+	},
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/main/libs/eslint-config-web#readme",
+	"bugs": {
+		"url": "https://github.com/tomcupak/apinecka-libs/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"peerDependencies": {
+		"@eslint/js": "^9",
+		"eslint": "^9",
+		"eslint-plugin-react-hooks": "^5",
+		"eslint-plugin-react-refresh": "^0.4",
+		"eslint-plugin-simple-import-sort": "^12",
+		"eslint-plugin-unused-imports": "^4",
+		"globals": "^16",
+		"typescript-eslint": "^8"
+	}
+}
