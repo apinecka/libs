@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/redis",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "NestJS module for Redis: a global ioredis connection, a tag-based cache-aside helper (RedisCache), and a distributed lock helper (RedisLocks).",
 	"keywords": [
 		"nestjs",

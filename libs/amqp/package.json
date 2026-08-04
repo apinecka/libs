@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/amqp",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "NestJS module for AMQP/RabbitMQ: declarative exchange/queue/binding schemas, decorator-based consumers, batch consumers, and publish helpers on top of amqp-connection-manager.",
 	"keywords": [
 		"nestjs",
