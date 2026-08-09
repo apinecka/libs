@@ -18,6 +18,8 @@ export interface CacheAdapter {
 
 	save: <Data extends CacheData>(key: string, data: Data, options: CacheSaveOptions) => Promise<Data>
 
+	take: <Data extends CacheData>(key: string) => Promise<Data | null>
+
 	remove: (key: string) => Promise<boolean>
 
 	invalidate: (tags: string | string[]) => Promise<number>

@@ -33,6 +33,7 @@ export class RedisCache implements CacheAdapter {
 		this.luaCommands = commandsAliases(redis)
 	}
 
+	/** Returns the cached value for `key`, or the result of `fallback` when it's missing (not cached automatically). */
 	async load<Data extends CacheData>(
 		key: string,
 		fallback: (key: string) => Promise<Data>,
@@ -45,7 +46,7 @@ export class RedisCache implements CacheAdapter {
 		}
 
 		if (rawData === 'null') {
-			return null
+			return null as Data
 		}
 
 		let data: SerializedData<Data>
@@ -53,12 +54,13 @@ export class RedisCache implements CacheAdapter {
 			data = JSON.parse(rawData) as SerializedData<Data>
 		} catch {
 			console.error('Failed to parse Redis data - invalid JSON')
-			return null
+			return null as Data
 		}
 
 		return deserialize ? deserialize(data) : (data as Data)
 	}
 
+	/** Stores `data` under `key` with the given expiration and tags. */
 	async save<Data extends CacheData>(key: string, data: Data, options: CacheSaveOptions): Promise<Data> {
 		await this.luaCommands.setData(
 			key,
@@ -70,6 +72,27 @@ export class RedisCache implements CacheAdapter {
 		return data
 	}
 
+	/** Atomically reads and removes the value for `key`, returning `null` if it wasn't cached. */
+	async take<Data extends CacheData>(key: string): Promise<Data | null> {
+		const rawData = await this.luaCommands.takeData(key)
+
+		if (rawData === null) {
+			return null
+		}
+
+		if (rawData === 'null') {
+			return null as Data
+		}
+
+		try {
+			return JSON.parse(rawData) as Data
+		} catch {
+			console.error('Failed to parse Redis data - invalid JSON')
+			return null
+		}
+	}
+
+	/** Removes the cached value and its tags for `key`. Returns whether an entry was removed. */
 	async remove(key: string): Promise<boolean> {
 		const count = await this.luaCommands.invalidate(
 			key,
@@ -78,6 +101,7 @@ export class RedisCache implements CacheAdapter {
 		return Number(count) === 1
 	}
 
+	/** Removes all cached entries associated with the given tag(s). Returns the number of removed entries. */
 	async invalidate(tags: string | string[]): Promise<number> {
 		const tagsArray = Array.isArray(tags) ? tags : [tags]
 		const count = await this.luaCommands.invalidateTags(
@@ -87,6 +111,7 @@ export class RedisCache implements CacheAdapter {
 		return Number(count)
 	}
 
+	/** Removes every entry within this cache's namespace. */
 	async flush() {
 		await this.luaCommands.flush()
 	}

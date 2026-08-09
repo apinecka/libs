@@ -9,6 +9,11 @@ declare module 'ioredis' {
 			command: 'getData',
 		): Result<null | string, Context>
 		cache(
+			keyCount: 1,
+			key: string,
+			command: 'takeData',
+		): Result<null | string, Context>
+		cache(
 			keyCount: 4,
 			key: string,
 			// JSON stringified data
@@ -39,6 +44,7 @@ declare module 'ioredis' {
 
 export const commandsAliases = (redis: Redis) => ({
 	getData: (key: string) => redis.cache(1, key, 'getData'),
+	takeData: (key: string) => redis.cache(1, key, 'takeData'),
 	setData: (key: string, data: string, expiration: number, tags: string) => redis.cache(4, key, data, expiration, tags, 'setData'),
 	invalidate: (tag: string) => redis.cache(1, tag, 'invalidate'),
 	invalidateTags: (tags: string) => redis.cache(1, tags, 'invalidateTags'),
@@ -105,6 +111,17 @@ export const cacheCommand = ({ namespace = 'data', scanBulk = 1000 }: {
 		-- Get item data
 		local function getData(key)
 			return redis.call('get', getItemDataKey(key))
+		end
+
+		-- Atomically get and delete item data (and its tags)
+		local function takeData(key)
+			local itemKey = getItemDataKey(key)
+			local data = redis.call('get', itemKey)
+			if data then
+				redis.call('del', itemKey)
+				removeKeyTags(key)
+			end
+			return data
 		end
 
 		-- Set item data
@@ -200,6 +217,10 @@ export const cacheCommand = ({ namespace = 'data', scanBulk = 1000 }: {
 		if (ARGV[1] == "getData") then
 
 			return getData(KEYS[1])
+
+		elseif (ARGV[1] == "takeData") then
+
+			return takeData(KEYS[1])
 
 		elseif (ARGV[1] == "setData") then
 

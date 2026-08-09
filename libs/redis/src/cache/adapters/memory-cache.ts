@@ -45,6 +45,19 @@ export class MemoryCache implements CacheAdapter {
 		return data
 	}
 
+	async take<Data>(key: string): Promise<Data | null> {
+		if (this.data[key] === undefined) {
+			return null
+		}
+
+		const data = this.data[key].data as Data
+		this.removeKeyFromTags(key)
+		this.removeExpiration(key)
+		delete this.data[key]
+
+		return data
+	}
+
 	async remove(key: string): Promise<boolean> {
 		if (!this.data[key]) {
 			return false

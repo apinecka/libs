@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: apinecka-libs-redis
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 5s
+      retries: 10

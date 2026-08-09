@@ -16,6 +16,38 @@ export class RedisLocks {
 		return false
 	}
 
+	async acquireOrWait(
+		key: string,
+		expirationSeconds: number, timeoutMs = 10_000,
+	) {
+		const start = Date.now()
+		while (!(await this.acquire(key, expirationSeconds))) {
+			if (Date.now() - start > timeoutMs)
+				throw new Error(`Timeout waiting to acquire lock: ${key}`)
+			await new Promise(resolve => setTimeout(resolve, 100))
+		}
+	}
+
+	async isHeld(key: string): Promise<boolean> {
+		const exists = await this.redis.exists(key)
+		return exists > 0
+	}
+
+	/** Atomically checks that guardKey is not held, then acquires acquireKey. Returns true if acquired. */
+	async acquireIfOtherNotHeld(guardKey: string, acquireKey: string, expirationSeconds: number): Promise<boolean> {
+		const lua = `
+			if redis.call('EXISTS', KEYS[1]) == 1 then
+				return 0
+			end
+			if redis.call('SET', KEYS[2], '1', 'NX', 'EX', ARGV[1]) then
+				return 1
+			end
+			return 0
+		`
+		const result = await this.redis.eval(lua, 2, guardKey, acquireKey, String(expirationSeconds))
+		return result === 1
+	}
+
 	async unlock(key: string) {
 		const count = await this.redis.del(key)
 		return count === 1

@@ -67,6 +67,42 @@ test('tags and invalidations', async () => {
 	})
 })
 
+test('take: missing key returns null', async () => {
+	await expect(cache.take('a')).resolves.toBeNull()
+})
+
+test('take: returns data and clears internal state', async () => {
+	const _cache = cache as any
+
+	await cache.save('a', { ok: true }, { expiration: 100 })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+
+	await expect(cache.load('a', nullFallback)).resolves.toBeNull()
+
+	expect(_cache.data).toEqual({})
+	expect(_cache.expirations).toEqual({})
+})
+
+test('take: removes tags', async () => {
+	const _cache = cache as any
+
+	await cache.save('a', { ok: true }, { expiration: 100, tags: ['t-a'] })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+
+	expect(_cache.data).toEqual({})
+	expect(_cache.expirations).toEqual({})
+	expect(_cache.tags).toEqual({})
+})
+
+test('take: second call on same key returns null', async () => {
+	await cache.save('a', { ok: true }, { expiration: 100 })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+	await expect(cache.take('a')).resolves.toBeNull()
+})
+
 test('flush', async () => {
 	for (let i = 0; i < 1000; i++) {
 		await cache.save(`item-${i}`, { iAmItem: i + 1 }, { expiration: 100, tags: ['generated', 'another-tag'] })

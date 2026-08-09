@@ -5,7 +5,7 @@ import { RedisCache } from '..'
 
 const redis = new Redis({
 	host: 'localhost',
-	port: 10101,
+	port: 6379,
 })
 
 let cache: RedisCache
@@ -126,6 +126,35 @@ test('tags invalidations with thousands of keys', async () => {
 		]),
 	)
 }, 20000)
+
+test('take: missing key returns null', async () => {
+	await expect(cache.take('a')).resolves.toBeNull()
+})
+
+test('take: returns data and removes the entry atomically', async () => {
+	await cache.save('a', { ok: true }, { expiration: 100 })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+
+	await expect(cache.load('a', nullFallback)).resolves.toBeNull()
+
+	await expect(redis.keys('cache:*:a')).resolves.toEqual([])
+})
+
+test('take: removes tag keys', async () => {
+	await cache.save('a', { ok: true }, { expiration: 100, tags: ['t-a'] })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+
+	await expect(redis.keys('*')).resolves.toEqual([])
+})
+
+test('take: second call on same key returns null', async () => {
+	await cache.save('a', { ok: true }, { expiration: 100 })
+
+	await expect(cache.take('a')).resolves.toMatchObject({ ok: true })
+	await expect(cache.take('a')).resolves.toBeNull()
+})
 
 test('flush', async () => {
 	const count = 1000
