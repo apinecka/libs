@@ -1,0 +1,65 @@
+{
+	"name": "@apinecka/drizzle",
+	"version": "1.0.0",
+	"description": "NestJS module for Drizzle ORM over Postgres: a DI-friendly connection wrapper, a lock-coordinated migration runner, and test-database helpers. Bring your own schema.",
+	"keywords": [
+		"nestjs",
+		"drizzle",
+		"drizzle-orm",
+		"postgres",
+		"postgresql"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./testing": {
+			"types": "./dist/testing/index.d.ts",
+			"default": "./dist/testing/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc",
+		"clean": "del-cli dist",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"author": "Tomáš Cupák <tomcupak@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tomcupak/apinecka-libs.git",
+		"directory": "libs/drizzle"
+	},
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/master/libs/drizzle#readme",
+	"bugs": {
+		"url": "https://github.com/tomcupak/apinecka-libs/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"peerDependencies": {
+		"@nestjs/common": "^11.0.0",
+		"drizzle-orm": "^0.45",
+		"pg": "^8.16"
+	},
+	"devDependencies": {
+		"@nestjs/common": "^11.1.7",
+		"@nestjs/core": "^11.1.7",
+		"@nestjs/testing": "^11.1.7",
+		"@types/node": "^22.15.33",
+		"@types/pg": "^8.11.10",
+		"del-cli": "^7.0.0",
+		"drizzle-orm": "^0.45.2",
+		"pg": "^8.16.2",
+		"reflect-metadata": "^0.2.2",
+		"typescript": "^5.8.3"
+	}
+}

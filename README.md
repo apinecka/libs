@@ -9,6 +9,7 @@ scope.
 | [`@apinecka/amqp-schema`](libs/amqp-schema) | Shared AMQP schema/contract for the apinecka logs pipeline |
 | [`@apinecka/eslint-config-be`](libs/eslint-config-be) | Shared ESLint flat config for Node.js/NestJS backends |
 | [`@apinecka/eslint-config-web`](libs/eslint-config-web) | Shared ESLint flat config for React/TypeScript frontends |
+| [`@apinecka/drizzle`](libs/drizzle) | NestJS module for Drizzle ORM over Postgres: connection wiring, migrations, and test-DB helpers |
 | [`@apinecka/redis`](libs/redis) | NestJS module for Redis: cache-aside helper and distributed locks |
 
 Each package builds and publishes independently from its own directory (`npm install && npm run build && npm publish`).
