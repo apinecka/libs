@@ -1,0 +1,55 @@
+{
+	"name": "@apinecka/jwt",
+	"version": "1.0.0",
+	"description": "NestJS module for unified JWT handling: RS512-signed tokens, multi-key rotation via key id (kid), and header/payload helpers.",
+	"keywords": [
+		"nestjs",
+		"jwt",
+		"jsonwebtoken",
+		"auth"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc",
+		"clean": "del-cli dist",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"author": "Tomáš Cupák <tomcupak@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tomcupak/apinecka-libs.git",
+		"directory": "libs/jwt"
+	},
+	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/master/libs/jwt#readme",
+	"bugs": {
+		"url": "https://github.com/tomcupak/apinecka-libs/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"peerDependencies": {
+		"@nestjs/common": "^11.0.0",
+		"jsonwebtoken": "^9.0"
+	},
+	"devDependencies": {
+		"@nestjs/common": "^11.1.7",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/node": "^22.15.33",
+		"del-cli": "^7.0.0",
+		"jsonwebtoken": "^9.0.2",
+		"typescript": "^5.8.3"
+	}
+}
