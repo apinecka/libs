@@ -50,6 +50,12 @@ a single connection under `main`, populated once Nest calls `onApplicationBootst
 startup - so don't read it from your own services' constructors or `onModuleInit()`, which run
 earlier.
 
+It also ends its connection pool for you on `onModuleDestroy()`, which Nest calls automatically
+when the app (or a `TestingModule`) is closed - `app.close()` in production (paired with
+`app.enableShutdownHooks()` to run it on `SIGTERM`/`SIGINT` too), `moduleRef.close()` in tests. No
+manual cleanup needed; call `provider.close()` directly only if you need to end the pool without
+tearing down the whole module.
+
 ## Schema registration
 
 `DrizzleProvider` deliberately stays a single, small class: one connection named `main`. You're
@@ -61,20 +67,24 @@ every app's DB wiring equally easy to read instead of hiding behind options.
 
 ```ts
 // db.provider.ts
-import { DrizzleCredentials, getDb } from '@apinecka/drizzle'
-import { Injectable } from '@nestjs/common'
+import { closeDb, DrizzleCredentials, getDb } from '@apinecka/drizzle'
+import { Injectable, OnModuleDestroy } from '@nestjs/common'
 import { NodePgDatabase } from 'drizzle-orm/node-postgres'
 
 import * as schema from './schema'
 
 @Injectable()
-export class DbProvider {
+export class DbProvider implements OnModuleDestroy {
 	primary!: NodePgDatabase<typeof schema>
 
 	constructor(private config: { credentials: DrizzleCredentials; schema: typeof schema }) {}
 
 	async onApplicationBootstrap() {
 		this.primary = await getDb(this.config)
+	}
+
+	async onModuleDestroy() {
+		await closeDb(this.primary)
 	}
 }
 ```
@@ -91,6 +101,9 @@ import * as schema from './schema'
 })
 export class AppModule {}
 ```
+
+Your own provider is responsible for its own cleanup, same as `DrizzleProvider` - `getDb()`'s
+result carries its underlying `pg` `Pool` as `$client`, and `closeDb()` is just `db.$client.end()`.
 
 **Need more than one database** (a second, unrelated database, or a read-only replica)? Copy
 `DrizzleProvider` and add one property + one `getDb()` call per connection in

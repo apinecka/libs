@@ -56,23 +56,25 @@ export async function migrateTestDb({ credentials = getTestDbCredentials(), migr
 	await migrateDb({ logger: new Logger('TestMigration'), credentials, migrationsPath, migrationLockKey })
 }
 
+/** Postgres identifier quoting - doubles embedded double-quotes, same as the server's own quote_ident(). */
+function quoteIdent(ident: string): string {
+	return `"${ident.replace(/"/g, '""')}"`
+}
+
 /**
- * Truncates every table in the given Postgres schemas between tests. `CASCADE` handles FK
- * ordering and `RESTART IDENTITY` resets serials, so tests don't depend on ID values from a
- * previous run.
+ * Truncates every table in the given Postgres schemas (`public` by default) between tests.
+ * `CASCADE` handles FK ordering and `RESTART IDENTITY` resets serials, so tests don't depend on ID
+ * values from a previous run.
+ *
+ * Issues a single `TRUNCATE TABLE` for every matched table instead of one statement per table, so
+ * this stays cheap to call from every test's `beforeEach`/`afterEach`.
  */
-export async function truncateTestDb(db: NodePgDatabase<Record<string, unknown>>, schemas: string[]) {
-	await db.execute(sql`
-		DO $$
-		DECLARE r RECORD;
-		BEGIN
-			FOR r IN
-				SELECT schemaname, tablename
-				FROM pg_tables
-				WHERE schemaname IN (${sql.join(schemas.map(s => sql`${s}`), sql`, `)})
-			LOOP
-				EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
-			END LOOP;
-		END $$
-	`)
+export async function truncateTestDb(db: NodePgDatabase<Record<string, unknown>>, schemas: string[] = ['public']) {
+	const { rows } = await db.execute<{ schemaname: string, tablename: string }>(
+		sql`SELECT schemaname, tablename FROM pg_tables WHERE schemaname IN (${sql.join(schemas.map(s => sql`${s}`), sql`, `)})`,
+	)
+	if (rows.length === 0) return
+
+	const tableList = rows.map(r => `${quoteIdent(r.schemaname)}.${quoteIdent(r.tablename)}`).join(', ')
+	await db.execute(sql.raw(`TRUNCATE TABLE ${tableList} RESTART IDENTITY CASCADE`))
 }

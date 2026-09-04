@@ -20,9 +20,25 @@ export async function getDb<Schema extends Record<string, unknown>>({ credential
 		max: credentials.pool || 4,
 	})
 
-	await pool.connect()
+	// Fail fast on bad credentials/unreachable DB instead of only on the first real query - and
+	// release the probe connection back to the pool instead of leaking it permanently checked out.
+	const probeClient = await pool.connect()
+	probeClient.release()
 
 	return drizzle(pool, { schema }) as NodePgDatabase<Schema>
+}
+
+/**
+ * Ends the connection pool behind a `getDb()` instance. Safe to call once, e.g. on graceful
+ * shutdown or between test files.
+ *
+ * Reaches for `$client` - drizzle-orm's own escape hatch onto the underlying `pg` client - via an
+ * unsafe cast, since `getDb()` deliberately keeps `$client` out of its own public return type:
+ * intersecting it there upsets drizzle-orm's schema-branding and breaks assignability of the
+ * `NodePgDatabase<Schema>` type everywhere else it's used.
+ */
+export async function closeDb(db: NodePgDatabase<Record<string, unknown>>) {
+	await (db as unknown as { $client: Pool }).$client.end()
 }
 
 const MIGRATION_MAX_ATTEMPTS = 5
