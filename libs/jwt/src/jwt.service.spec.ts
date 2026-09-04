@@ -91,6 +91,19 @@ test('validateToken: rejects an expired token', async () => {
 	expect(() => service.validateToken(token)).toThrow(/expired/)
 })
 
+test('loadKey: resolves a relative key path against process.cwd(), not this package\'s own directory', () => {
+	writeKeyPair('main') // populates `dir` with main.pub/main.key
+	const cwdBefore = process.cwd()
+	process.chdir(dir)
+	try {
+		const service = new JwtService({ issuer: 'test', activeKid: 'main', keys: [{ kid: 'main', publicKeyPath: 'main.pub', privateKeyPath: 'main.key' }] })
+		const token = service.createToken({ sub: 'user-1' }, 60)
+		expect(service.validateToken<{ sub: string }>(token).sub).toBe('user-1')
+	} finally {
+		process.chdir(cwdBefore)
+	}
+})
+
 test('key rotation: a token signed by the previous key still validates once it is kept as a read-only key', () => {
 	const previous = writeKeyPair('previous')
 	const current = writeKeyPair('current')

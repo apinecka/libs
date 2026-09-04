@@ -91,7 +91,10 @@ JwtModule.forRoot({
 recognizable `kid` (or an unknown one) is rejected.
 
 `publicKeyPath`/`privateKeyPath` may be absolute, or relative — relative paths are resolved
-against the compiled module's directory (`dist` at runtime), not the process's working directory.
+against `process.cwd()`, i.e. wherever the app was started from, the same as e.g.
+`@apinecka/drizzle`'s `migrationsPath`. Pass an absolute path (`path.resolve(__dirname, ...)`)
+instead if your app's cwd isn't guaranteed to be its own root - a bundler that inlines everything
+into one file, or a process manager that launches from a different directory.
 
 On construction, `JwtService` signs and validates a throwaway token with the active key pair and
 throws if that round-trip fails, so a misconfigured key pair (mismatched keys, unreadable file,

@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/jwt",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "NestJS module for unified JWT handling: RS512-signed tokens, multi-key rotation via key id (kid), and header/payload helpers.",
 	"keywords": [
 		"nestjs",

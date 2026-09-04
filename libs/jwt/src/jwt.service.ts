@@ -84,9 +84,11 @@ export class JwtService {
 	}
 
 	private loadKey(keyPath: string): string {
+		// Relative to the process's cwd, not this package's own __dirname (which - once installed
+		// under a consuming app's node_modules - resolves nowhere near that app's key files).
 		const absPath = path.isAbsolute(keyPath)
 			? keyPath
-			: path.resolve(__dirname, keyPath)
+			: path.resolve(process.cwd(), keyPath)
 
 		try {
 			return fs.readFileSync(absPath, 'utf-8')
