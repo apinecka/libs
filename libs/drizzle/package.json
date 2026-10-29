@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/drizzle",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "NestJS module for Drizzle ORM over Postgres: a DI-friendly connection wrapper, a lock-coordinated migration runner, and test-database helpers. Bring your own schema.",
 	"keywords": [
 		"nestjs",
@@ -19,6 +19,11 @@
 		"./testing": {
 			"types": "./dist/testing/index.d.ts",
 			"default": "./dist/testing/index.js"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"testing": ["dist/testing/index.d.ts"]
 		}
 	},
 	"files": [
