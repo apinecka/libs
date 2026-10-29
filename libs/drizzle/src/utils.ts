@@ -120,4 +120,5 @@ export async function migrateDb({ logger, credentials, migrationsPath, migration
 /** Postgres error codes (`error.code` on exceptions thrown by `pg`/`drizzle-orm`) worth branching on. */
 export const PostgresErrorCode = {
 	UniqueViolation: '23505',
+	InsufficientPrivilege: '42501',
 } as const

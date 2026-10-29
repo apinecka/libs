@@ -264,7 +264,7 @@ code).
 Migrating is comparatively slow and every test file reuses the same schema, so run
 `dropAndCreateTestDb()`/`migrateTestDb()` **exactly once for the whole test run**, via Jest's
 `globalSetup` - never per test file, and never per test. Individual tests then just
-`truncateTestDb()` to guarantee empty tables:
+`truncateTestDb()` in `beforeEach` to start from empty tables:
 
 ```ts
 // jest.global-setup.ts - runs once, before any test file, in its own process
@@ -290,10 +290,47 @@ module.exports = {
 // some.spec.ts
 import { truncateTestDb } from '@apinecka/drizzle/testing'
 
-afterEach(async () => {
-	await truncateTestDb(db, ['public'])
+beforeEach(() => truncateTestDb(db, ['public']))
+```
+
+`truncateTestDb()` is cheap - a few tens of ms even for 100+ tables - so call it from every
+test's `beforeEach` and don't add `TRUNCATE`s of your own. Despite the name it doesn't run
+`TRUNCATE` (which costs ~200 ms per call even on empty tables), but a single `DELETE` per table with
+FK triggers off, and resets the tables' sequences. The effect is the same as
+`TRUNCATE ... RESTART IDENTITY CASCADE`: tables in other schemas that reference the emptied ones
+are emptied too, and serial/identity IDs start over.
+
+Turning FK triggers off needs a superuser, or on Postgres 15+
+`GRANT SET ON PARAMETER session_replication_role TO <test role>`. Without that, `truncateTestDb()`
+logs a warning once and falls back to the slow `TRUNCATE`.
+
+### Concurrency tests
+
+The `pg` pool connects lazily. In `Promise.all([call(), call()])` the first call's transaction
+often commits before the second connection even exists, so a race test passes even with its lock,
+`onConflictDoUpdate` or unique constraint removed. Call `warmTestDbPool()` right before the race,
+so the connections are already open:
+
+```ts
+import { warmTestDbPool } from '@apinecka/drizzle/testing'
+
+it('books the last seat only once', async () => {
+	await warmTestDbPool(db) // 2 connections by default, pass a count for more callers
+
+	const results = await Promise.allSettled([service.book(seatId), service.book(seatId)])
+
+	expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1)
 })
 ```
+
+Prove a race test before trusting it: remove the guard (lock or constraint) it covers and watch the
+test fail on several runs in a row.
+
+### Keeping DB tests lean
+
+Each DB test pays for a round trip and a `truncateTestDb()`, so write one DB test per scenario,
+not per assertion: assert everything the scenario guarantees in that one test, and cover pure
+logic with unit tests that don't touch the database.
 
 `getTestDbCredentials()` reads `TEST_DB_HOST` / `TEST_DB_PORT` / `TEST_DB_USER` /
 `TEST_DB_PASSWORD` / `TEST_DB_NAME`, falling back to a local Postgres on the default port.
