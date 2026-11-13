@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/eslint-config-be",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Shared ESLint flat config for apinecka Node.js/NestJS backends (TypeScript, tabs, import sorting, unused-imports).",
 	"keywords": [
 		"eslint",

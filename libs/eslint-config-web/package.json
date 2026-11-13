@@ -1,6 +1,6 @@
 {
 	"name": "@apinecka/eslint-config-web",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Shared ESLint flat config for apinecka React/TypeScript frontends (tabs, import sorting, unused-imports, react-hooks).",
 	"keywords": [
 		"eslint",
