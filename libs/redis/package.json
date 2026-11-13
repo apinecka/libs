@@ -31,12 +31,12 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tomcupak/apinecka-libs.git",
+		"url": "https://github.com/apinecka/libs.git",
 		"directory": "libs/redis"
 	},
-	"homepage": "https://github.com/tomcupak/apinecka-libs/tree/master/libs/redis#readme",
+	"homepage": "https://github.com/apinecka/libs/tree/master/libs/redis#readme",
 	"bugs": {
-		"url": "https://github.com/tomcupak/apinecka-libs/issues"
+		"url": "https://github.com/apinecka/libs/issues"
 	},
 	"publishConfig": {
 		"access": "public"
